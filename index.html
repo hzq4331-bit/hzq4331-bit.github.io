@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mechinedesign — Mechanical Design & Working Prototypes</title>
+<meta id="meta-desc" name="description" content="Freelance mechanical design engineer in Dongguan, China. Parametric 3D modeling, engineering drawings, FEA simulation and working prototypes — from a sketch to a machine that runs.">
+<style>
+  :root{
+    --ink:#16233a; --body:#3c4a61; --muted:#71809a; --line:#dde4ee;
+    --accent:#1d4ed8; --accent-dark:#173d9f; --bg:#ffffff; --soft:#f4f7fb;
+    --card:#ffffff; --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--body);background:var(--bg);line-height:1.65}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* header */
+  header{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:10}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{font-weight:800;font-size:20px;color:var(--ink);letter-spacing:.2px}
+  .brand span{color:var(--accent)}
+  .nav-links{display:flex;gap:26px;font-size:15px}
+  .nav-links a{color:var(--body)}
+  .nav-links a:hover{color:var(--accent);text-decoration:none}
+  @media(max-width:640px){.nav-links{display:none}}
+  .lang-switch{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-left:22px;flex:none}
+  .lang-switch button{border:none;background:#fff;color:var(--muted);font-size:13px;font-weight:600;padding:5px 13px;cursor:pointer;font-family:inherit}
+  .lang-switch button.active{background:var(--accent);color:#fff}
+
+  /* hero */
+  .hero{background:
+      linear-gradient(rgba(29,78,216,.045) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(29,78,216,.045) 1px,transparent 1px),
+      var(--soft);
+    background-size:28px 28px,28px 28px,auto;
+    border-bottom:1px solid var(--line);padding:76px 0 68px}
+  .hero h1{font-size:42px;line-height:1.18;color:var(--ink);font-weight:800;max-width:760px}
+  .hero h1 em{font-style:normal;color:var(--accent)}
+  .hero .sub{margin-top:18px;font-size:18px;max-width:720px}
+  .hero .sub-cn{margin-top:8px;font-size:15px;color:var(--muted)}
+  .hero-cta{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap}
+  .btn{display:inline-block;padding:12px 24px;border-radius:10px;font-weight:600;font-size:15px;border:1px solid var(--accent)}
+  .btn:hover{text-decoration:none}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:hover{background:var(--accent-dark)}
+  .btn-ghost{background:#fff;color:var(--accent)}
+  .hero-facts{margin-top:36px;display:flex;gap:34px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+  .hero-facts b{display:block;font-size:22px;color:var(--ink);font-weight:800}
+
+  /* sections */
+  section{padding:64px 0}
+  section.alt{background:var(--soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  h2{font-size:28px;color:var(--ink);font-weight:800;margin-bottom:8px}
+  .sec-lead{color:var(--muted);max-width:720px;margin-bottom:34px}
+
+  /* services */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px}
+  .card h3{color:var(--ink);font-size:17px;margin-bottom:8px}
+  .card p{font-size:14.5px}
+  .card .tag{display:inline-block;font-size:12px;color:var(--accent);background:rgba(29,78,216,.08);border-radius:20px;padding:2px 10px;margin-bottom:12px;font-weight:600}
+
+  /* process */
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;counter-reset:step}
+  .step{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+  .step .n{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:1px}
+  .step h3{color:var(--ink);font-size:16px;margin:6px 0 6px}
+  .step p{font-size:14px}
+
+  /* work */
+  .case{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:28px;margin-bottom:20px}
+  .case h3{color:var(--ink);font-size:20px;margin-bottom:4px}
+  .case .meta{font-size:13px;color:var(--muted);margin-bottom:14px}
+  .case .status{display:inline-block;font-size:12px;font-weight:700;color:#8a5a00;background:#fdf0d5;border-radius:20px;padding:2px 10px;margin-left:8px;vertical-align:2px}
+  .case .status.run{color:#166534;background:#dcfce7}
+  .case p{font-size:15px;margin-bottom:10px}
+  .case p b{color:var(--ink)}
+  .photos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  @media(max-width:640px){.photos{grid-template-columns:1fr}}
+  .photo{border:1.5px dashed #b9c6da;border-radius:10px;background:var(--soft);color:var(--muted);
+    display:flex;align-items:center;justify-content:center;text-align:center;min-height:170px;padding:16px;font-size:14px}
+  .photo img{max-width:100%;border-radius:8px;display:block}
+  .photo:has(img),.photo:has(video){border:none;background:none;padding:0;min-height:0;display:block}
+  .photo video{width:100%;border-radius:8px;display:block}
+
+  /* tools strip */
+  .tools-list{display:flex;flex-wrap:wrap;gap:10px}
+  .tools-list span{border:1px solid var(--line);background:#fff;border-radius:20px;padding:6px 14px;font-size:14px;color:var(--ink)}
+
+  /* contact */
+  .contact-box{background:var(--ink);color:#dbe4f3;border-radius:var(--radius);padding:34px}
+  .contact-box h2{color:#fff}
+  .contact-box a{color:#9db9f5}
+  .contact-rows{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:16px;font-size:15px}
+  .contact-rows b{color:#fff;display:block;font-size:13px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+
+  footer{padding:28px 0 40px;color:var(--muted);font-size:13.5px;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand">mechine<span>design</span>.xyz</div>
+    <nav class="nav-links">
+      <a href="#services" data-i18n="nav_services">Services</a>
+      <a href="#process" data-i18n="nav_process">Process</a>
+      <a href="#work" data-i18n="nav_work">Work</a>
+      <a href="#toolbox" data-i18n="nav_tools">Free Tools</a>
+      <a href="#contact" data-i18n="nav_contact">Contact</a>
+    </nav>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" id="btn-en" onclick="setLang('en')">EN</button>
+      <button type="button" id="btn-zh" onclick="setLang('zh')">中文</button>
+    </div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <h1 data-i18n="hero_h1">From a sketch to a <em>working prototype</em> — mechanical design that actually runs.</h1>
+    <p class="sub" data-i18n="hero_sub">I'm a mechanical design &amp; manufacturing engineer in Dongguan, China, with 30 years of product development experience. I help small manufacturers and founders validate product ideas at low cost <b>before</b> committing to tooling — through parametric CAD, standard-compliant drawings, simulation, and hands-on prototyping, all in one pipeline.</p>
+    <p class="sub-cn">机械设计制造工程师 · 3D 建模 / 出图 / 仿真 / 样机全链路 · 帮小厂商低成本试错</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#contact" data-i18n="cta_start">Start a project</a>
+      <a class="btn btn-ghost" href="#work" data-i18n="cta_work">See selected work</a>
+    </div>
+    <div class="hero-facts">
+      <div><b data-i18n="fact1_n">30 yrs</b><span data-i18n="fact1_t">product design &amp; development</span></div>
+      <div><b data-i18n="fact2_n">Full pipeline</b><span data-i18n="fact2_t">structure · drawings · control · debug</span></div>
+      <div><b data-i18n="fact3_n">Fixed price</b><span data-i18n="fact3_t">quoted per project, remote worldwide</span></div>
+    </div>
+  </div>
+</div>
+
+<section id="services">
+  <div class="wrap">
+    <h2 data-i18n="svc_h2">Services</h2>
+    <p class="sec-lead" data-i18n="svc_lead">Project-based freelance work, quoted at a fixed price before we start. Native CAD files and STEP are always included — you own the design.</p>
+    <div class="grid">
+      <div class="card">
+        <span class="tag" data-i18n="svc1_tag">3D Modeling</span>
+        <h3 data-i18n="svc1_h3">Parametric 3D Modeling</h3>
+        <p data-i18n="svc1_p">Clean, fully editable parametric models from sketches, photos, drawings or rough concepts. Clean feature tree, design intent preserved — not dumb solids. DFM check included.</p>
+      </div>
+      <div class="card">
+        <span class="tag" data-i18n="svc2_tag">Drawings</span>
+        <h3 data-i18n="svc2_h3">Engineering 2D Drawings</h3>
+        <p data-i18n="svc2_p">Manufacturing-ready drawings to ISO/GB conventions: dimensioning, GD&amp;T where it matters, surface finish, complete title blocks. PDF + DWG + native files. Tolerances assigned by assembly function, not decoration.</p>
+      </div>
+      <div class="card">
+        <span class="tag" data-i18n="svc3_tag">Simulation</span>
+        <h3 data-i18n="svc3_h3">FEA &amp; Motion Simulation</h3>
+        <p data-i18n="svc3_p">Static stress/strain analysis and mechanism motion checks before you cut steel: max stress, deformation, safety factor, pass/fail against your criteria — plus concrete redesign suggestions where it fails.</p>
+      </div>
+      <div class="card">
+        <span class="tag" data-i18n="svc4_tag">Prototyping</span>
+        <h3 data-i18n="svc4_h3">Working Prototypes</h3>
+        <p data-i18n="svc4_p">The full mechatronics loop: 3D printing, machining, casting, electrical control design, component sourcing, microcontroller programming support, wiring and debugging — delivered as a machine that runs, not just geometry.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="process" class="alt">
+  <div class="wrap">
+    <h2 data-i18n="proc_h2">How I work</h2>
+    <p class="sec-lead" data-i18n="proc_lead">An AI-assisted workflow for speed, held to old-school drawing-office discipline: every release passes design review, DFM and process checks. AI drafts fast; engineering judgment signs off.</p>
+    <div class="steps">
+      <div class="step"><div class="n" data-i18n="step1_n">STEP 1</div><h3 data-i18n="step1_h3">Concept</h3><p data-i18n="step1_p">Requirements, constraints and feasibility — including the red flags, stated up front.</p></div>
+      <div class="step"><div class="n" data-i18n="step2_n">STEP 2</div><h3 data-i18n="step2_h3">Parametric CAD</h3><p data-i18n="step2_p">Rapid structure iteration in Inventor / SolidWorks / Fusion 360.</p></div>
+      <div class="step"><div class="n" data-i18n="step3_n">STEP 3</div><h3 data-i18n="step3_h3">Simulate &amp; DFM</h3><p data-i18n="step3_p">Stress and motion checks; wall thickness, draft, tolerances and assembly fit reviewed.</p></div>
+      <div class="step"><div class="n" data-i18n="step4_n">STEP 4</div><h3 data-i18n="step4_h3">Print &amp; Machine</h3><p data-i18n="step4_p">3D printing, machining or casting — whichever validates the design cheapest.</p></div>
+      <div class="step"><div class="n" data-i18n="step5_n">STEP 5</div><h3 data-i18n="step5_h3">Assemble &amp; Debug</h3><p data-i18n="step5_p">Control scheme, sourcing list, wiring and debugging guidance until it runs.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <h2 data-i18n="work_h2">Selected work</h2>
+    <p class="sec-lead" data-i18n="work_lead">My own R&amp;D programs, shown with their real status — what is verified, and what is still in progress. Client work stays confidential; more detail available under NDA.</p>
+
+    <div class="case">
+      <h3><span data-i18n="c1_title">XP1 Smart Tennis Ball Machine</span><span class="status" data-i18n="c1_status">EVT prototype · in development</span></h3>
+      <div class="meta" data-i18n="c1_meta">Mechatronics · dual launch wheels · ESP32 control · power &amp; safety architecture</div>
+      <p data-i18n="c1_p1"><b>The program.</b> A tennis training machine with adjustable speed, spin and direction: twin launch wheels on a two-axis (pitch / yaw) aiming rig, sequenced by one controller with a proper safety chain.</p>
+      <p data-i18n="c1_p2"><b>What is built and verified.</b> 36&nbsp;V power bus with layered supplies and emergency stop; dual VESC drives (UART) on 6364 200&nbsp;KV launch motors and two RobStride RS01 joint motors sharing a CAN bus; modular ESP32 firmware with an OLED status display, a browser console and a phone control page. The interlock sequence — self-check → homing → lock → standby → launch enable — is implemented, and a 40-point no-ball aiming patrol runs end to end. Live-ball launch tests have been performed. Patents are being filed on the mechanism and control method; structural details are available under NDA.</p>
+      <p data-i18n="c1_p3"><b>Still in progress.</b> Ball feeding, landing-point calibration and continuous live-ball reliability — stated plainly, because an EVT prototype is not a finished product.</p>
+      <div class="photos">
+        <div class="photo"><img src="assets/xp1-rig.jpg" alt="XP1 ball machine test rig — full wiring overview" data-i18n-alt="c1_alt1"></div>
+        <div class="photo"><img src="assets/xp1-esp32.jpg" alt="ESP32 controller with expansion board, wired and powered" data-i18n-alt="c1_alt2"></div>
+      </div>
+    </div>
+
+    <div class="case">
+      <h3><span data-i18n="c2_title">Vision-Guided Ball-Tracking Chassis</span><span class="status run" data-i18n="c2_status">Running prototype</span></h3>
+      <div class="meta" data-i18n="c2_meta">Computer vision · court calibration · ESP32-S3 closed-loop chassis</div>
+      <p data-i18n="c2_p1"><b>The problem.</b> A camera sees pixels; a chassis needs court coordinates. This mobile base has to find a tennis ball on the court and drive to it — calibration is the whole game.</p>
+      <p data-i18n="c2_p2"><b>What I built.</b> Off-court USB cameras with OpenCV tracking (HSV + motion/shape filtering); court calibration by ArUco markers, corrected with white-line fitting and manual four-corner trim, saved per camera. The chassis is an ESP32-S3 with dual MDD10A drivers and four encoder motors in closed-loop RPM control, with Wi-Fi telemetry, OTA updates and an 800&nbsp;ms communication watchdog that stops the vehicle if the link dies.</p>
+      <p data-i18n="c2_p3"><b>Verified results.</b> 300&nbsp;RPM closed-loop re-test passed on all four wheels (4-second averages 304.7 / 306.7 / 296.1 / 306.4&nbsp;RPM); ground run of about 1.2&nbsp;m in ~1.8&nbsp;s at 300&nbsp;RPM; 50 software tests passing at handover. Continuous high-speed interception of bounced balls is the next development stage, not a claim.</p>
+      <div class="photos">
+        <div class="photo"><img src="assets/vision-dual.jpg" alt="Dual-camera ball-tracking debug view over the calibration field" data-i18n-alt="c2_alt1"></div>
+        <div class="photo"><img src="assets/vision-wiring.png" alt="ESP32-S3 dual motor driver wiring diagram" data-i18n-alt="c2_alt2"></div>
+      </div>
+    </div>
+
+    <div class="case">
+      <h3><span data-i18n="c3_title">CY90-50 Cycloidal Reducer</span><span class="status" data-i18n="c3_status">Design study · kinematically verified</span></h3>
+      <div class="meta" data-i18n="c3_meta">Precision reducer design · native CAD · geometry read-back verification</div>
+      <p data-i18n="c3_p1"><b>The work.</b> A compact cycloidal reducer, Ø90 × 41&nbsp;mm, 50:1, with twin eccentric discs, pin-and-roller set and a disassembly-friendly bearing arrangement — designed natively in Inventor, not sketched.</p>
+      <p data-i18n="c3_p2"><b>Verification discipline.</b> Both cycloidal disc profiles were read back at 40,050 points each and checked against the generating parameters (numerical agreement ≈ 0.00004&nbsp;mm — a geometry check, not a machining claim); 13 input and 25 output poses were position-checked, and a motion preview generated. Load and life testing have not been performed yet, and the page says so.</p>
+      <div class="photos">
+        <div class="photo"><img src="assets/cy90-assembly.png" alt="CY90-50 cycloidal reducer — complete assembly render" data-i18n-alt="c3_alt1"></div>
+        <div class="photo"><video src="assets/cy90-motion.mp4" poster="assets/cy90-internal.png" autoplay muted loop playsinline></video></div>
+      </div>
+    </div>
+
+    <div class="case">
+      <h3><span data-i18n="c4_title">Integrated Mecanum Wheel Module</span><span class="status" data-i18n="c4_status">Design stage</span></h3>
+      <div class="meta" data-i18n="c4_meta">Motor-in-wheel · sheet-metal frame · standard-parts engineering</div>
+      <p data-i18n="c4_p1"><b>The work.</b> A mecanum wheel with its out-runner motor, driver PCB and absolute encoder integrated into the hub — no external transmission, a tight installation envelope, and a two-piece folded sheet-metal wheel frame with true flat-pattern development.</p>
+      <p data-i18n="c4_p2"><b>Where it stands.</b> Native Inventor assembly built with traceable content-center standard parts (63 instances); the 3-page drawing set passed an independent structural assembly review. Manufacturing release and driver-board bring-up are in progress — design-stage work, presented as such.</p>
+      <div class="photos">
+        <div class="photo"><img src="assets/wm-m13.png" alt="WM150 wheel module — standard-parts assembly (M13)" data-i18n-alt="c4_alt1"></div>
+        <div class="photo"><img src="assets/wm-driver-pcb-3d.png" alt="Annular FOC driver PCB for the wheel module, 3D view" data-i18n-alt="c4_alt2"></div>
+      </div>
+    </div>
+
+    <div class="case">
+      <h3><span data-i18n="c5_title">AI-Assisted Engineering Automation</span><span class="status run" data-i18n="c5_status">In daily use</span></h3>
+      <div class="meta" data-i18n="c5_meta">CAD automation · Inventor MCP / COM · exact B-rep geometry</div>
+      <p data-i18n="c5_p1"><b>The work.</b> A pipeline that connects AI agents to professional CAD with an audit trail: task in → native CAD → read-back verification → drawing review. A read-only MCP channel to Autodesk Inventor is verified end to end (handshake, tool enumeration, health checks); native modeling runs through COM automation — for example a 24-slot / 71-lamination / 21-turn stator geometry created, saved and read back — and exact B-rep work (booleans, mass properties, STEP exchange) runs on the SMLib kernel via USD BRep.</p>
+      <p data-i18n="c5_p2"><b>Why it matters to clients.</b> The same tooling iterates your design: faster revisions, every claim about the model backed by read-back numbers instead of screenshots.</p>
+    </div>
+  </div>
+</section>
+
+<section id="toolbox" class="alt">
+  <div class="wrap">
+    <h2 data-i18n="tb_h2">Free engineering toolbox</h2>
+    <p class="sec-lead" data-i18n="tb_lead">Small, practical references I use myself — free to use, values verified against GB/T standards.</p>
+    <div class="card" style="max-width:560px">
+      <span class="tag" data-i18n="tb_tag">Toolbox</span>
+      <h3 data-i18n="tb_h3">Formula &amp; Standard-Parts Quick Reference</h3>
+      <p data-i18n="tb_p">Searchable mechanical-design formulas with built-in calculators: fits, threads, gears, springs and more.</p>
+      <p style="margin-top:12px"><a href="tools/formula-search/"><b data-i18n="tb_link">Open the quick reference →</b></a></p>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="wrap">
+    <h2 data-i18n="stack_h2">Toolbox &amp; stack</h2>
+    <p class="sec-lead" data-i18n="stack_lead">The software and processes behind the work above.</p>
+    <div class="tools-list">
+      <span>Autodesk Inventor</span><span>SolidWorks</span><span>Fusion 360</span><span>AutoCAD</span>
+      <span data-i18n="chip_fea">FEA Simulation</span><span data-i18n="chip_3dp">3D Printing</span><span data-i18n="chip_pu">PU Casting</span><span data-i18n="chip_cnc">CNC Machining</span>
+      <span data-i18n="chip_esp">ESP32 / Microcontroller Control</span><span data-i18n="chip_cv">OpenCV Vision</span><span data-i18n="chip_dfm">DFM Review</span><span>GD&amp;T</span><span>STEP / DXF / DWG</span>
+    </div>
+  </div>
+</section>
+
+<section id="contact" style="padding-top:0">
+  <div class="wrap">
+    <div class="contact-box">
+      <h2 data-i18n="contact_h2">Have something to build?</h2>
+      <p style="margin-top:8px" data-i18n="contact_p">Send a sketch, a photo, or even a rough description — I'll reply with feasibility, a fixed-price quote and a timeline. NDA welcome; all files stay confidential.</p>
+      <div class="contact-rows">
+        <div><b data-i18n="contact_email">Email</b><a href="mailto:756230678@qq.com">756230678@qq.com</a></div>
+        <div><b>Cad Crowd</b>Zhiqiangh1</div>
+        <div><b data-i18n="contact_based">Based in</b><span data-i18n="contact_based_val">Dongguan, Guangdong, China — working remotely, worldwide</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" data-i18n="footer">© 2026 mechinedesign.xyz · Mechanical design &amp; prototyping · Dongguan, China</div>
+</footer>
+
+<script>
+/* ============ i18n: EN / 中文 ============ */
+const I18N = {
+en: {
+  __title: "mechinedesign — Mechanical Design & Working Prototypes",
+  __desc: "Freelance mechanical design engineer in Dongguan, China. Parametric 3D modeling, engineering drawings, FEA simulation and working prototypes — from a sketch to a machine that runs.",
+  nav_services: "Services", nav_process: "Process", nav_work: "Work", nav_tools: "Free Tools", nav_contact: "Contact",
+  hero_h1: "From a sketch to a <em>working prototype</em> — mechanical design that actually runs.",
+  hero_sub: "I'm a mechanical design &amp; manufacturing engineer in Dongguan, China, with 30 years of product development experience. I help small manufacturers and founders validate product ideas at low cost <b>before</b> committing to tooling — through parametric CAD, standard-compliant drawings, simulation, and hands-on prototyping, all in one pipeline.",
+  cta_start: "Start a project", cta_work: "See selected work",
+  fact1_n: "30 yrs", fact1_t: "product design &amp; development",
+  fact2_n: "Full pipeline", fact2_t: "structure · drawings · control · debug",
+  fact3_n: "Fixed price", fact3_t: "quoted per project, remote worldwide",
+  svc_h2: "Services",
+  svc_lead: "Project-based freelance work, quoted at a fixed price before we start. Native CAD files and STEP are always included — you own the design.",
+  svc1_tag: "3D Modeling", svc1_h3: "Parametric 3D Modeling",
+  svc1_p: "Clean, fully editable parametric models from sketches, photos, drawings or rough concepts. Clean feature tree, design intent preserved — not dumb solids. DFM check included.",
+  svc2_tag: "Drawings", svc2_h3: "Engineering 2D Drawings",
+  svc2_p: "Manufacturing-ready drawings to ISO/GB conventions: dimensioning, GD&amp;T where it matters, surface finish, complete title blocks. PDF + DWG + native files. Tolerances assigned by assembly function, not decoration.",
+  svc3_tag: "Simulation", svc3_h3: "FEA &amp; Motion Simulation",
+  svc3_p: "Static stress/strain analysis and mechanism motion checks before you cut steel: max stress, deformation, safety factor, pass/fail against your criteria — plus concrete redesign suggestions where it fails.",
+  svc4_tag: "Prototyping", svc4_h3: "Working Prototypes",
+  svc4_p: "The full mechatronics loop: 3D printing, machining, casting, electrical control design, component sourcing, microcontroller programming support, wiring and debugging — delivered as a machine that runs, not just geometry.",
+  proc_h2: "How I work",
+  proc_lead: "An AI-assisted workflow for speed, held to old-school drawing-office discipline: every release passes design review, DFM and process checks. AI drafts fast; engineering judgment signs off.",
+  step1_n: "STEP 1", step1_h3: "Concept", step1_p: "Requirements, constraints and feasibility — including the red flags, stated up front.",
+  step2_n: "STEP 2", step2_h3: "Parametric CAD", step2_p: "Rapid structure iteration in Inventor / SolidWorks / Fusion 360.",
+  step3_n: "STEP 3", step3_h3: "Simulate &amp; DFM", step3_p: "Stress and motion checks; wall thickness, draft, tolerances and assembly fit reviewed.",
+  step4_n: "STEP 4", step4_h3: "Print &amp; Machine", step4_p: "3D printing, machining or casting — whichever validates the design cheapest.",
+  step5_n: "STEP 5", step5_h3: "Assemble &amp; Debug", step5_p: "Control scheme, sourcing list, wiring and debugging guidance until it runs.",
+  work_h2: "Selected work",
+  work_lead: "My own R&amp;D programs, shown with their real status — what is verified, and what is still in progress. Client work stays confidential; more detail available under NDA.",
+  c1_title: "XP1 Smart Tennis Ball Machine", c1_status: "EVT prototype · in development",
+  c1_meta: "Mechatronics · dual launch wheels · ESP32 control · power &amp; safety architecture",
+  c1_p1: "<b>The program.</b> A tennis training machine with adjustable speed, spin and direction: twin launch wheels on a two-axis (pitch / yaw) aiming rig, sequenced by one controller with a proper safety chain.",
+  c1_p2: "<b>What is built and verified.</b> 36&nbsp;V power bus with layered supplies and emergency stop; dual VESC drives (UART) on 6364 200&nbsp;KV launch motors and two RobStride RS01 joint motors sharing a CAN bus; modular ESP32 firmware with an OLED status display, a browser console and a phone control page. The interlock sequence — self-check → homing → lock → standby → launch enable — is implemented, and a 40-point no-ball aiming patrol runs end to end. Live-ball launch tests have been performed. Patents are being filed on the mechanism and control method; structural details are available under NDA.",
+  c1_p3: "<b>Still in progress.</b> Ball feeding, landing-point calibration and continuous live-ball reliability — stated plainly, because an EVT prototype is not a finished product.",
+  c1_alt1: "XP1 ball machine test rig — full wiring overview",
+  c1_alt2: "ESP32 controller with expansion board, wired and powered",
+  c2_title: "Vision-Guided Ball-Tracking Chassis", c2_status: "Running prototype",
+  c2_meta: "Computer vision · court calibration · ESP32-S3 closed-loop chassis",
+  c2_p1: "<b>The problem.</b> A camera sees pixels; a chassis needs court coordinates. This mobile base has to find a tennis ball on the court and drive to it — calibration is the whole game.",
+  c2_p2: "<b>What I built.</b> Off-court USB cameras with OpenCV tracking (HSV + motion/shape filtering); court calibration by ArUco markers, corrected with white-line fitting and manual four-corner trim, saved per camera. The chassis is an ESP32-S3 with dual MDD10A drivers and four encoder motors in closed-loop RPM control, with Wi-Fi telemetry, OTA updates and an 800&nbsp;ms communication watchdog that stops the vehicle if the link dies.",
+  c2_p3: "<b>Verified results.</b> 300&nbsp;RPM closed-loop re-test passed on all four wheels (4-second averages 304.7 / 306.7 / 296.1 / 306.4&nbsp;RPM); ground run of about 1.2&nbsp;m in ~1.8&nbsp;s at 300&nbsp;RPM; 50 software tests passing at handover. Continuous high-speed interception of bounced balls is the next development stage, not a claim.",
+  c2_alt1: "Dual-camera ball-tracking debug view over the calibration field",
+  c2_alt2: "ESP32-S3 dual motor driver wiring diagram",
+  c3_title: "CY90-50 Cycloidal Reducer", c3_status: "Design study · kinematically verified",
+  c3_meta: "Precision reducer design · native CAD · geometry read-back verification",
+  c3_p1: "<b>The work.</b> A compact cycloidal reducer, Ø90 × 41&nbsp;mm, 50:1, with twin eccentric discs, pin-and-roller set and a disassembly-friendly bearing arrangement — designed natively in Inventor, not sketched.",
+  c3_p2: "<b>Verification discipline.</b> Both cycloidal disc profiles were read back at 40,050 points each and checked against the generating parameters (numerical agreement ≈ 0.00004&nbsp;mm — a geometry check, not a machining claim); 13 input and 25 output poses were position-checked, and a motion preview generated. Load and life testing have not been performed yet, and the page says so.",
+  c3_alt1: "CY90-50 cycloidal reducer — complete assembly render",
+  c4_title: "Integrated Mecanum Wheel Module", c4_status: "Design stage",
+  c4_meta: "Motor-in-wheel · sheet-metal frame · standard-parts engineering",
+  c4_p1: "<b>The work.</b> A mecanum wheel with its out-runner motor, driver PCB and absolute encoder integrated into the hub — no external transmission, a tight installation envelope, and a two-piece folded sheet-metal wheel frame with true flat-pattern development.",
+  c4_p2: "<b>Where it stands.</b> Native Inventor assembly built with traceable content-center standard parts (63 instances); the 3-page drawing set passed an independent structural assembly review. Manufacturing release and driver-board bring-up are in progress — design-stage work, presented as such.",
+  c4_alt1: "WM150 wheel module — standard-parts assembly (M13)",
+  c4_alt2: "Annular FOC driver PCB for the wheel module, 3D view",
+  c5_title: "AI-Assisted Engineering Automation", c5_status: "In daily use",
+  c5_meta: "CAD automation · Inventor MCP / COM · exact B-rep geometry",
+  c5_p1: "<b>The work.</b> A pipeline that connects AI agents to professional CAD with an audit trail: task in → native CAD → read-back verification → drawing review. A read-only MCP channel to Autodesk Inventor is verified end to end (handshake, tool enumeration, health checks); native modeling runs through COM automation — for example a 24-slot / 71-lamination / 21-turn stator geometry created, saved and read back — and exact B-rep work (booleans, mass properties, STEP exchange) runs on the SMLib kernel via USD BRep.",
+  c5_p2: "<b>Why it matters to clients.</b> The same tooling iterates your design: faster revisions, every claim about the model backed by read-back numbers instead of screenshots.",
+  tb_h2: "Free engineering toolbox",
+  tb_lead: "Small, practical references I use myself — free to use, values verified against GB/T standards.",
+  tb_tag: "Toolbox", tb_h3: "Formula &amp; Standard-Parts Quick Reference",
+  tb_p: "Searchable mechanical-design formulas with built-in calculators: fits, threads, gears, springs and more.",
+  tb_link: "Open the quick reference →",
+  stack_h2: "Toolbox &amp; stack",
+  stack_lead: "The software and processes behind the work above.",
+  chip_fea: "FEA Simulation", chip_3dp: "3D Printing", chip_pu: "PU Casting", chip_cnc: "CNC Machining",
+  chip_esp: "ESP32 / Microcontroller Control", chip_cv: "OpenCV Vision", chip_dfm: "DFM Review",
+  contact_h2: "Have something to build?",
+  contact_p: "Send a sketch, a photo, or even a rough description — I'll reply with feasibility, a fixed-price quote and a timeline. NDA welcome; all files stay confidential.",
+  contact_email: "Email", contact_based: "Based in",
+  contact_based_val: "Dongguan, Guangdong, China — working remotely, worldwide",
+  footer: "© 2026 mechinedesign.xyz · Mechanical design &amp; prototyping · Dongguan, China"
+},
+zh: {
+  __title: "mechinedesign — 机械设计与能跑起来的样机",
+  __desc: "位于中国东莞的自由机械设计工程师。参数化三维建模、工程图、有限元仿真与可运行样机——从一张草图到一台能转起来的机器。",
+  nav_services: "服务", nav_process: "流程", nav_work: "案例", nav_tools: "免费工具", nav_contact: "联系",
+  hero_h1: "从一张草图到一台<em>能跑起来的样机</em>——做真正能运行的机械设计。",
+  hero_sub: "我是一名位于中国东莞的机械设计制造工程师，拥有 30 年产品开发经验。我帮助小型制造商和创业者在投入开模<b>之前</b>，先以低成本验证产品想法——参数化 CAD、符合标准规范的工程图、仿真验证与亲手制作样机，全部在一条链路里完成。",
+  cta_start: "开始一个项目", cta_work: "查看精选案例",
+  fact1_n: "30 年", fact1_t: "产品设计与开发",
+  fact2_n: "全链路", fact2_t: "结构 · 出图 · 控制 · 调试",
+  fact3_n: "固定总价", fact3_t: "按项目报价，远程服务全球",
+  svc_h2: "服务",
+  svc_lead: "按项目承接的自由职业设计服务，开工前先报固定总价。原生 CAD 文件和 STEP 始终包含在交付内——设计成果归你所有。",
+  svc1_tag: "三维建模", svc1_h3: "参数化三维建模",
+  svc1_p: "从草图、照片、图纸或粗略想法出发，建立干净、可完全编辑的参数化模型。特征树整洁、设计意图完整保留——不是无参数的“呆实体”。含 DFM 可制造性检查。",
+  svc2_tag: "工程图", svc2_h3: "工程二维图",
+  svc2_p: "按 ISO/GB 制图规范绘制可直接投产的图纸：尺寸标注、在关键处标注几何公差（GD&amp;T）、表面粗糙度要求、完整的标题栏。交付 PDF + DWG + 原生文件。公差按装配功能分配，而不是为了好看。",
+  svc3_tag: "仿真", svc3_h3: "有限元与运动仿真",
+  svc3_p: "在下料开钢之前先做静力应力/应变分析与机构运动校核：最大应力、变形量、安全系数，并按你的判据给出通过/不通过结论——不达标处附上具体的结构改进建议。",
+  svc4_tag: "样机", svc4_h3: "可运行样机",
+  svc4_p: "完整的机电一体化闭环：3D 打印、机加工、铸造、电气控制设计、元器件采购、单片机编程支持、接线与调试——交付的是一台能转起来的机器，而不只是一堆几何模型。",
+  proc_h2: "工作方式",
+  proc_lead: "以 AI 辅助提速，但坚持老派制图室的纪律：每一次图纸发放都要通过设计评审、DFM 与工艺检查。AI 负责快速出稿，最终由工程判断签字把关。",
+  step1_n: "第 1 步", step1_h3: "方案构思", step1_p: "需求、约束与可行性——包括风险点，事先如实讲明。",
+  step2_n: "第 2 步", step2_h3: "参数化 CAD", step2_p: "在 Inventor / SolidWorks / Fusion 360 中快速迭代结构方案。",
+  step3_n: "第 3 步", step3_h3: "仿真与 DFM", step3_p: "应力与运动校核；复核壁厚、拔模斜度、公差与装配配合。",
+  step4_n: "第 4 步", step4_h3: "打印与加工", step4_p: "3D 打印、机加工或铸造——用成本最低的方式验证设计。",
+  step5_n: "第 5 步", step5_h3: "装配与调试", step5_p: "控制方案、采购清单、接线与调试指导，直到它真正转起来。",
+  work_h2: "精选案例",
+  work_lead: "我自己的研发项目，按真实状态展示——哪些已经验证，哪些还在进行中。客户项目保密；更多细节可在签署 NDA 后提供。",
+  c1_title: "XP1 智能网球发球机", c1_status: "EVT 样机 · 开发中",
+  c1_meta: "机电一体化 · 双发球轮 · ESP32 控制 · 供电与安全架构",
+  c1_p1: "<b>项目概况。</b>一台球速、旋转与方向可调的网球训练发球机：双发球轮安装在两轴（俯仰 / 偏航）瞄准机构上，由一台控制器统一时序控制，并配有完整的安全联锁链。",
+  c1_p2: "<b>已建成并验证的部分。</b>36&nbsp;V 动力母线，分层供电并设急停；双 VESC 驱动器（UART）驱动 6364 200&nbsp;KV 发球电机，两台 RobStride RS01 关节电机共用一条 CAN 总线；模块化 ESP32 固件，带 OLED 状态显示、浏览器控制台与手机控制页。联锁时序——自检 → 归零 → 锁定 → 待命 → 允许发球——已完整实现，40 点无球巡点瞄准可全程跑通。已进行实球发射试验。相关机构与控制方法的专利正在申请中；结构细节可在签署 NDA 后提供。",
+  c1_p3: "<b>仍在进行的部分。</b>供球机构、落点标定与连续实球发射的可靠性——如实说明，因为 EVT 样机还不是成品。",
+  c1_alt1: "XP1 发球机测试台架——接线全景",
+  c1_alt2: "ESP32 控制器与扩展板，已接线并通电",
+  c2_title: "视觉引导的网球跟踪底盘", c2_status: "运行原型",
+  c2_meta: "计算机视觉 · 场地标定 · ESP32-S3 闭环底盘",
+  c2_p1: "<b>问题所在。</b>摄像头看到的是像素，底盘需要的却是场地坐标。这个移动底盘要在球场上找到网球并行驶到它跟前——标定就是全部关键所在。",
+  c2_p2: "<b>我做的工作。</b>场外 USB 摄像头结合 OpenCV 跟踪（HSV + 运动/形状过滤）；场地标定先用 ArUco 标记，再以白线拟合与四角人工微调修正，并按相机分别保存参数。底盘采用 ESP32-S3 与双 MDD10A 驱动器，四台带编码器的电机做转速闭环控制，同时具备 Wi-Fi 遥测、OTA 升级，以及 800&nbsp;ms 通信看门狗——链路一旦中断立即停车。",
+  c2_p3: "<b>已验证的结果。</b>300&nbsp;RPM 闭环复测四轮全部通过（4 秒均值 304.7 / 306.7 / 296.1 / 306.4&nbsp;RPM）；在 300&nbsp;RPM 下落地行驶约 1.2&nbsp;m、用时约 1.8&nbsp;s；交接时 50 项软件测试全部通过。对弹跳来球的连续高速拦截是下一阶段的开发目标，不是已经具备的能力。",
+  c2_alt1: "双摄像头网球跟踪调试画面，背景为标定场地",
+  c2_alt2: "ESP32-S3 双电机驱动器接线图",
+  c3_title: "CY90-50 摆线减速器", c3_status: "设计研究 · 已完成运动学核验",
+  c3_meta: "精密减速器设计 · 原生 CAD 建模 · 几何回读校验",
+  c3_p1: "<b>工作内容。</b>一台紧凑型摆线减速器，Ø90 × 41&nbsp;mm，传动比 50:1，双偏心摆线盘配针齿滚子组，轴承布置便于拆装——在 Inventor 中原生设计，而非草图拼凑。",
+  c3_p2: "<b>校验纪律。</b>两片摆线盘的齿廓各回读 40,050 个点，并与生成参数逐一核对（数值吻合度约 0.00004&nbsp;mm——这是几何校验，不是加工精度宣称）；对 13 个输入姿态与 25 个输出姿态做了位置检查，并生成了运动预览。承载与寿命试验尚未进行，本页如实标注。",
+  c3_alt1: "CY90-50 摆线减速器——整机装配渲染图",
+  c4_title: "一体化麦克纳姆轮模组", c4_status: "设计阶段",
+  c4_meta: "轮毂电机一体化 · 钣金轮架 · 标准件工程化",
+  c4_p1: "<b>工作内容。</b>将外转子电机、驱动 PCB 与绝对值编码器全部集成进轮毂的麦克纳姆轮——无外置传动机构，安装包络紧凑；轮架为两件式折弯钣金，带真实的钣金展开图。",
+  c4_p2: "<b>当前状态。</b>Inventor 原生装配，标准件取自可追溯的资源中心库（共 63 处实例）；三页工程图已通过独立的结构装配评审。制造发放与驱动板上电调试正在进行——这是设计阶段的工作，如实呈现。",
+  c4_alt1: "WM150 轮模组——标准件装配（M13）",
+  c4_alt2: "轮模组用环形 FOC 驱动 PCB 三维视图",
+  c5_title: "AI 辅助工程自动化", c5_status: "日常使用中",
+  c5_meta: "CAD 自动化 · Inventor MCP / COM · 精确 B-rep 几何",
+  c5_p1: "<b>工作内容。</b>一条把 AI 智能体接入专业 CAD 的链路，全过程可审计：任务输入 → 原生 CAD 生成 → 回读校验 → 图纸评审。通往 Autodesk Inventor 的只读 MCP 通道已端到端验证（握手、工具枚举、健康检查）；原生建模通过 COM 自动化完成——例如一个 24 槽 / 71 片叠片 / 21 匝的定子几何，已创建、保存并回读校验；精确 B-rep 运算（布尔运算、质量属性、STEP 数据交换）则由 USD BRep 之上的 SMLib 几何内核承担。",
+  c5_p2: "<b>对客户的价值。</b>用同一套工具迭代你的设计：改版更快，而关于模型的每一个结论都有回读数据作依据，而不是靠截图说话。",
+  tb_h2: "免费工程工具箱",
+  tb_lead: "我自己也在用的小而实用的参考工具——免费使用，其中数值均按 GB/T 标准核验。",
+  tb_tag: "工具箱", tb_h3: "公式与标准件速查",
+  tb_p: "可检索的机械设计公式，内置计算器：配合、螺纹、齿轮、弹簧等。",
+  tb_link: "打开速查工具 →",
+  stack_h2: "工具与技术栈",
+  stack_lead: "支撑上述工作的软件与工艺手段。",
+  chip_fea: "有限元仿真", chip_3dp: "3D 打印", chip_pu: "聚氨酯浇筑", chip_cnc: "CNC 加工",
+  chip_esp: "ESP32 / 单片机控制", chip_cv: "OpenCV 视觉", chip_dfm: "DFM 评审",
+  contact_h2: "有想做出来的东西？",
+  contact_p: "发一张草图、一张照片，甚至只是一段粗略的描述——我会回复可行性判断、固定总价报价与工期安排。欢迎签署 NDA；所有文件严格保密。",
+  contact_email: "邮箱", contact_based: "所在地",
+  contact_based_val: "中国广东东莞——远程协作，服务全球客户",
+  footer: "© 2026 mechinedesign.xyz · 机械设计与样机开发 · 中国东莞"
+}
+};
+function setLang(lang) {
+  if (!I18N[lang]) lang = "en";
+  const dict = I18N[lang];
+  document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+  document.title = dict.__title;
+  document.getElementById("meta-desc").setAttribute("content", dict.__desc);
+  document.querySelectorAll("[data-i18n]").forEach(function (el) {
+    const v = dict[el.getAttribute("data-i18n")];
+    if (v !== undefined) el.innerHTML = v;
+  });
+  document.querySelectorAll("[data-i18n-alt]").forEach(function (el) {
+    const v = dict[el.getAttribute("data-i18n-alt")];
+    if (v !== undefined) el.setAttribute("alt", v);
+  });
+  document.getElementById("btn-en").classList.toggle("active", lang === "en");
+  document.getElementById("btn-zh").classList.toggle("active", lang === "zh");
+  try { localStorage.setItem("md-lang", lang); } catch (e) {}
+}
+(function () {
+  let lang = null;
+  try { lang = localStorage.getItem("md-lang"); } catch (e) {}
+  if (!lang) {
+    const nav = (navigator.language || "en").toLowerCase();
+    lang = nav.indexOf("zh") === 0 ? "zh" : "en";
+  }
+  setLang(lang);
+})();
+</script>
+</body>
+</html>

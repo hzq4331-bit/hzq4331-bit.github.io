@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>机械工程师公式速查 v0.1</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f4f5f7; color: #222; line-height: 1.6; }
+  header { background: #1a2b4a; color: #fff; padding: 28px 20px; text-align: center; position: relative; }
+  header h1 { font-size: 22px; font-weight: 600; }
+  header p { font-size: 13px; opacity: .75; margin-top: 6px; }
+  .lang-switch { position: absolute; right: 16px; top: 16px; display: flex; border: 1px solid rgba(255,255,255,.45); border-radius: 20px; overflow: hidden; }
+  .lang-switch button { border: none; background: transparent; color: rgba(255,255,255,.75); font-size: 13px; font-weight: 600; padding: 5px 13px; cursor: pointer; font-family: inherit; }
+  .lang-switch button.active { background: #fff; color: #1a2b4a; }
+  @media (max-width: 640px) { .lang-switch { position: static; justify-content: center; margin: 12px auto 0; width: fit-content; } }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 20px 16px 60px; }
+  .search-box { position: sticky; top: 0; background: #f4f5f7; padding: 14px 0 10px; z-index: 10; }
+  .search-box input { width: 100%; font-size: 17px; padding: 13px 16px; border: 2px solid #1a2b4a; border-radius: 10px; outline: none; }
+  .search-box input:focus { border-color: #2f6fed; }
+  .cats { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 4px; }
+  .cats button { border: 1px solid #ccd2dc; background: #fff; border-radius: 20px; padding: 6px 16px; font-size: 14px; cursor: pointer; }
+  .cats button.active { background: #1a2b4a; color: #fff; border-color: #1a2b4a; }
+  .count { font-size: 13px; color: #888; margin: 8px 2px; }
+  .card { background: #fff; border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .card h2 { font-size: 17px; margin-bottom: 4px; }
+  .card h2 .tag { font-size: 11px; color: #2f6fed; border: 1px solid #2f6fed; border-radius: 4px; padding: 1px 7px; margin-left: 8px; vertical-align: 2px; font-weight: 400; }
+  .kw { font-size: 12px; color: #999; margin-bottom: 10px; }
+  .formula { background: #f0f4ff; border-left: 4px solid #2f6fed; padding: 10px 14px; margin: 10px 0; font-size: 16px; font-family: "Cambria Math", serif; }
+  .note { font-size: 13px; color: #666; margin-top: 8px; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 14px; }
+  th, td { border: 1px solid #e2e6ec; padding: 7px 10px; text-align: left; }
+  th { background: #f6f8fb; font-weight: 600; }
+  .calc { background: #fafbfd; border: 1px dashed #b9c6dd; border-radius: 8px; padding: 12px 14px; margin-top: 12px; }
+  .calc h3 { font-size: 14px; margin-bottom: 8px; }
+  .calc .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .calc label { font-size: 13px; }
+  .calc input { width: 90px; padding: 6px 8px; font-size: 14px; border: 1px solid #ccd2dc; border-radius: 6px; }
+  .calc button { background: #2f6fed; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 14px; cursor: pointer; }
+  .calc .out { font-size: 14px; margin-top: 8px; color: #1a2b4a; font-weight: 600; }
+  footer { text-align: center; font-size: 12px; color: #aaa; padding: 24px 0; }
+  .empty { text-align: center; color: #999; padding: 40px 0; font-size: 15px; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="hdr-title">🔧 机械工程师公式速查</h1>
+  <p id="hdr-sub">一个搜索框，打通公式 · 电气 · 标准件 · 单位换算 —— v0.1 演示版</p>
+  <div class="lang-switch" role="group" aria-label="Language">
+    <button type="button" id="btn-en" onclick="setLang('en')">EN</button>
+    <button type="button" id="btn-zh" onclick="setLang('zh')">中文</button>
+  </div>
+</header>
+<div class="wrap">
+  <div class="search-box">
+    <input id="q" type="text" placeholder="搜：M12 / 9550 / 电流 / 轴承 / 密度…" autocomplete="off">
+    <div class="cats" id="cats"></div>
+    <div class="count" id="count"></div>
+  </div>
+  <div id="list"></div>
+</div>
+<footer id="ftr">v0.1 · 首批 9 个条目 · 螺栓/平键/轴承/公差表格已按 GB/T 标准值交叉核验</footer>
+
+<script>
+/* ============ i18n：UI 框架文案（条目内容在 DATA 里按 title_en / body_en 切换） ============ */
+const UI = {
+  zh: {
+    docTitle: "机械工程师公式速查 v0.1",
+    hdrTitle: "🔧 机械工程师公式速查",
+    hdrSub: "一个搜索框，打通公式 · 电气 · 标准件 · 单位换算 —— v0.1 演示版",
+    placeholder: "搜：M12 / 9550 / 电流 / 轴承 / 密度…",
+    kwLabel: "关键词：",
+    count: n => `共 ${n} 条结果`,
+    empty: q => `没找到「${q}」<br>换个关键词试试，比如 M12 / 9550 / 轴承`,
+    footer: "v0.1 · 首批 9 个条目 · 螺栓/平键/轴承/公差表格已按 GB/T 标准值交叉核验",
+    cats: { "全部": "全部", "机械公式": "机械公式", "电气公式": "电气公式", "标准件规格": "标准件规格", "单位换算": "单位换算" },
+    ptnErr: "请恰好填写其中两项。",
+    i3Err: "请填写功率 P（kW）。",
+    lsErr: "请填写直径 D 和转速 n。"
+  },
+  en: {
+    docTitle: "Mechanical Engineer's Formula Quick Reference v0.1",
+    hdrTitle: "🔧 Mechanical Engineer's Formula Quick Reference",
+    hdrSub: "One search box across formulas · electrical · standard parts · unit conversion — v0.1 demo",
+    placeholder: "Search: M12 / 9550 / current / bearing / density…",
+    kwLabel: "Keywords: ",
+    count: n => `${n} result${n === 1 ? "" : "s"}`,
+    empty: q => `No results for "${q}"<br>Try another keyword, e.g. M12 / 9550 / bearing`,
+    footer: "v0.1 · First 9 entries · Bolt / key / bearing / tolerance tables cross-checked against GB/T standard values",
+    cats: { "全部": "All", "机械公式": "Mechanical", "电气公式": "Electrical", "标准件规格": "Standard Parts", "单位换算": "Unit Conversion" },
+    ptnErr: "Please fill in exactly two of the three values.",
+    i3Err: "Please enter the power P (kW).",
+    lsErr: "Please enter diameter D and speed n."
+  }
+};
+let LANG = "zh";
+
+/* ============ 数据区：以后加条目只改这里（可拆成 data.json） ============ */
+const DATA = [
+  {
+    id: "ptn", cat: "机械公式", title: "功率 · 扭矩 · 转速", title_en: "Power · Torque · Speed",
+    kw: "9550 功率 扭矩 转速 P T n 千瓦 牛米 rpm power torque speed",
+    body: `<div class="formula">P(kW) = T(N·m) × n(r/min) ÷ 9550</div>
+      <div class="note">变形：T = 9550 × P ÷ n ；n = 9550 × P ÷ T。注意单位：P 用千瓦、T 用牛·米、n 用转/分。</div>
+      <div class="calc"><h3>🧮 算一下：已知任意两项求第三项</h3>
+        <div class="row">
+          <label>P <input id="cP" type="number" step="any" placeholder="kW"></label>
+          <label>T <input id="cT" type="number" step="any" placeholder="N·m"></label>
+          <label>n <input id="cN" type="number" step="any" placeholder="r/min"></label>
+          <button onclick="calcPTN()">计算</button>
+        </div>
+        <div class="out" id="cOut"></div>
+      </div>`,
+    body_en: `<div class="formula">P(kW) = T(N·m) × n(r/min) ÷ 9550</div>
+      <div class="note">Variants: T = 9550 × P ÷ n ; n = 9550 × P ÷ T. Mind the units: P in kilowatts, T in newton-metres, n in revolutions per minute.</div>
+      <div class="calc"><h3>🧮 Try it: enter any two values to get the third</h3>
+        <div class="row">
+          <label>P <input id="cP" type="number" step="any" placeholder="kW"></label>
+          <label>T <input id="cT" type="number" step="any" placeholder="N·m"></label>
+          <label>n <input id="cN" type="number" step="any" placeholder="r/min"></label>
+          <button onclick="calcPTN()">Calculate</button>
+        </div>
+        <div class="out" id="cOut"></div>
+      </div>`
+  },
+  {
+    id: "i3p", cat: "电气公式", title: "三相电机电流估算", title_en: "Three-Phase Motor Current Estimate",
+    kw: "电流 380V 三相 电机 1.732 cos 功率因数 安培 current motor three-phase",
+    body: `<div class="formula">I = P ÷ (√3 × U × cosφ × η)</div>
+      <div class="note">工程估算（380V，cosφ·η≈0.8）：<b>I(A) ≈ 2 × P(kW)</b>。例：7.5kW 电机 ≈ 15A。<br>
+      单相 220V：I = P ÷ (U × cosφ × η)，估算 <b>I(A) ≈ 4.5 × P(kW)</b>。</div>
+      <div class="calc"><h3>🧮 算一下：三相电机电流</h3>
+        <div class="row">
+          <label>P <input id="ci3P" type="number" step="any" placeholder="kW"></label>
+          <label>U <input id="ci3U" type="number" step="any" placeholder="V" value="380"></label>
+          <label>cosφ <input id="ci3C" type="number" step="any" placeholder="0.85" value="0.85"></label>
+          <label>η <input id="ci3E" type="number" step="any" placeholder="0.9" value="0.9"></label>
+          <button onclick="calcI3()">计算</button>
+        </div>
+        <div class="out" id="ci3Out"></div>
+      </div>`,
+    body_en: `<div class="formula">I = P ÷ (√3 × U × cosφ × η)</div>
+      <div class="note">Shop-floor estimate (380 V, cosφ·η≈0.8): <b>I(A) ≈ 2 × P(kW)</b>. Example: a 7.5 kW motor ≈ 15 A.<br>
+      Single-phase 220 V: I = P ÷ (U × cosφ × η), estimate <b>I(A) ≈ 4.5 × P(kW)</b>.</div>
+      <div class="calc"><h3>🧮 Try it: three-phase motor current</h3>
+        <div class="row">
+          <label>P <input id="ci3P" type="number" step="any" placeholder="kW"></label>
+          <label>U <input id="ci3U" type="number" step="any" placeholder="V" value="380"></label>
+          <label>cosφ <input id="ci3C" type="number" step="any" placeholder="0.85" value="0.85"></label>
+          <label>η <input id="ci3E" type="number" step="any" placeholder="0.9" value="0.9"></label>
+          <button onclick="calcI3()">Calculate</button>
+        </div>
+        <div class="out" id="ci3Out"></div>
+      </div>`
+  },
+  {
+    id: "linspeed", cat: "机械公式", title: "线速度计算", title_en: "Surface Speed Calculation",
+    kw: "线速度 直径 转速 m/s v πD 砂轮 surface speed grinding wheel",
+    body: `<div class="formula">v(m/s) = π × D(mm) × n(r/min) ÷ 60000</div>
+      <div class="note">例：Ø100 砂轮 3000rpm → v ≈ 15.7 m/s。注意 D 用毫米、n 用转/分，结果是米/秒。</div>
+      <div class="calc"><h3>🧮 算一下：直径 + 转速 → 线速度</h3>
+        <div class="row">
+          <label>D <input id="lsD" type="number" step="any" placeholder="mm"></label>
+          <label>n <input id="lsN" type="number" step="any" placeholder="r/min"></label>
+          <button onclick="calcLS()">计算</button>
+        </div>
+        <div class="out" id="lsOut"></div>
+      </div>`,
+    body_en: `<div class="formula">v(m/s) = π × D(mm) × n(r/min) ÷ 60000</div>
+      <div class="note">Example: a Ø100 grinding wheel at 3000 rpm → v ≈ 15.7 m/s. Note: D in millimetres, n in rpm, result in metres per second.</div>
+      <div class="calc"><h3>🧮 Try it: diameter + speed → surface speed</h3>
+        <div class="row">
+          <label>D <input id="lsD" type="number" step="any" placeholder="mm"></label>
+          <label>n <input id="lsN" type="number" step="any" placeholder="r/min"></label>
+          <button onclick="calcLS()">Calculate</button>
+        </div>
+        <div class="out" id="lsOut"></div>
+      </div>`
+  },
+  {
+    id: "sync", cat: "电气公式", title: "电机同步转速", title_en: "Motor Synchronous Speed",
+    kw: "同步转速 极数 50Hz 3000 1500 1000 750 极对数 synchronous speed poles",
+    body: `<div class="formula">n₀ = 60 × f ÷ p　（p 为极对数）</div>
+      <table><tr><th>极数</th><th>2极</th><th>4极</th><th>6极</th><th>8极</th></tr>
+      <tr><td>同步转速 (50Hz)</td><td>3000</td><td>1500</td><td>1000</td><td>750</td></tr>
+      <tr><td>常见额定转速</td><td>≈2930</td><td>≈1440</td><td>≈960</td><td>≈720</td></tr></table>
+      <div class="note">额定转速略低于同步转速，差值即转差率；选减速机、算速比时用额定转速。</div>`,
+    body_en: `<div class="formula">n₀ = 60 × f ÷ p　(p = number of pole pairs)</div>
+      <table><tr><th>Poles</th><th>2-pole</th><th>4-pole</th><th>6-pole</th><th>8-pole</th></tr>
+      <tr><td>Synchronous speed (50 Hz)</td><td>3000</td><td>1500</td><td>1000</td><td>750</td></tr>
+      <tr><td>Typical rated speed</td><td>≈2930</td><td>≈1440</td><td>≈960</td><td>≈720</td></tr></table>
+      <div class="note">Rated speed sits slightly below synchronous speed; the difference is the slip. Use the rated speed when selecting a reducer or working out a gear ratio.</div>`
+  },
+  {
+    id: "bolt", cat: "标准件规格", title: "螺栓粗牙规格 · 扳手尺寸 · 底孔", title_en: "Coarse-Thread Bolts · Wrench Sizes · Tap Drills",
+    kw: "M12 螺栓 螺距 粗牙 对边 扳手 底孔 攻丝 M6 M8 M10 bolt thread pitch wrench tap drill",
+    body: `<table><tr><th>螺纹</th><th>粗牙螺距</th><th>对边 S（新/老）</th><th>底孔径</th></tr>
+      <tr><td>M3</td><td>0.5</td><td>5.5</td><td>2.5</td></tr>
+      <tr><td>M4</td><td>0.7</td><td>7</td><td>3.3</td></tr>
+      <tr><td>M5</td><td>0.8</td><td>8</td><td>4.2</td></tr>
+      <tr><td>M6</td><td>1.0</td><td>10</td><td>5.0</td></tr>
+      <tr><td>M8</td><td>1.25</td><td>13</td><td>6.8</td></tr>
+      <tr><td>M10</td><td>1.5</td><td>16 / 17</td><td>8.5</td></tr>
+      <tr><td>M12</td><td>1.75</td><td>18 / 19</td><td>10.2</td></tr>
+      <tr><td>M16</td><td>2.0</td><td>24</td><td>14.0</td></tr>
+      <tr><td>M20</td><td>2.5</td><td>30</td><td>17.5</td></tr>
+      <tr><td>M24</td><td>3.0</td><td>36</td><td>21.0</td></tr></table>
+      <div class="note">底孔径 ≈ 公称直径 − 螺距；新国标 M10/M12 对边为 16/18，老件常见 17/19，配扳手时注意。</div>`,
+    body_en: `<table><tr><th>Thread</th><th>Coarse pitch</th><th>Across-flats S (new / old)</th><th>Tap drill dia.</th></tr>
+      <tr><td>M3</td><td>0.5</td><td>5.5</td><td>2.5</td></tr>
+      <tr><td>M4</td><td>0.7</td><td>7</td><td>3.3</td></tr>
+      <tr><td>M5</td><td>0.8</td><td>8</td><td>4.2</td></tr>
+      <tr><td>M6</td><td>1.0</td><td>10</td><td>5.0</td></tr>
+      <tr><td>M8</td><td>1.25</td><td>13</td><td>6.8</td></tr>
+      <tr><td>M10</td><td>1.5</td><td>16 / 17</td><td>8.5</td></tr>
+      <tr><td>M12</td><td>1.75</td><td>18 / 19</td><td>10.2</td></tr>
+      <tr><td>M16</td><td>2.0</td><td>24</td><td>14.0</td></tr>
+      <tr><td>M20</td><td>2.5</td><td>30</td><td>17.5</td></tr>
+      <tr><td>M24</td><td>3.0</td><td>36</td><td>21.0</td></tr></table>
+      <div class="note">Tap drill diameter ≈ nominal diameter − pitch. Under the current GB standard, across-flats for M10/M12 are 16/18; older hardware is often 17/19 — check before selecting a wrench.</div>`
+  },
+  {
+    id: "tol", cat: "标准件规格", title: "常用公差配合速查", title_en: "Common Tolerance Fits",
+    kw: "公差 H7 g6 k6 m6 配合 间隙 过渡 过盈 基孔制 tolerance fit clearance transition interference",
+    body: `<table><tr><th>轴公差带</th><th>性质</th><th>典型用法</th></tr>
+      <tr><td>g6</td><td>间隙</td><td>滑动、转动配合</td></tr>
+      <tr><td>h6 / h7</td><td>间隙</td><td>精密滑动、定位</td></tr>
+      <tr><td>k6</td><td>过渡</td><td>轻敲可装配的定位</td></tr>
+      <tr><td>m6</td><td>过渡偏紧</td><td>需压力装配</td></tr>
+      <tr><td>js6</td><td>过渡偏松</td><td>较松的定位</td></tr></table>
+      <div class="note">基孔制常用：H7/g6（间隙·滑动）、H7/h6（间隙·精密）、H7/k6（过渡·定位）、H7/m6（过渡·较紧）、H7/s6（过盈·压装）。孔常用 H7、H8。</div>`,
+    body_en: `<table><tr><th>Shaft tolerance grade</th><th>Fit type</th><th>Typical use</th></tr>
+      <tr><td>g6</td><td>Clearance</td><td>Sliding and rotating fits</td></tr>
+      <tr><td>h6 / h7</td><td>Clearance</td><td>Precision sliding, locating</td></tr>
+      <tr><td>k6</td><td>Transition</td><td>Locating fits, assembled with light tapping</td></tr>
+      <tr><td>m6</td><td>Transition (tight)</td><td>Requires press assembly</td></tr>
+      <tr><td>js6</td><td>Transition (loose)</td><td>Looser locating fits</td></tr></table>
+      <div class="note">Common hole-basis combinations: H7/g6 (clearance · sliding), H7/h6 (clearance · precision), H7/k6 (transition · locating), H7/m6 (transition · tighter), H7/s6 (interference · press fit). Holes are usually H7 or H8.</div>`
+  },
+  {
+    id: "key", cat: "标准件规格", title: "普通平键尺寸（轴径 → 键）", title_en: "Parallel Key Sizes (Shaft Dia. → Key)",
+    kw: "键 键槽 平键 b h 轴径 parallel key keyway shaft",
+    body: `<table><tr><th>轴径 d (mm)</th><th>键宽 b × 键高 h (mm)</th></tr>
+      <tr><td>6–8</td><td>2 × 2</td></tr><tr><td>8–10</td><td>3 × 3</td></tr>
+      <tr><td>10–12</td><td>4 × 4</td></tr><tr><td>12–17</td><td>5 × 5</td></tr>
+      <tr><td>17–22</td><td>6 × 6</td></tr><tr><td>22–30</td><td>8 × 7</td></tr>
+      <tr><td>30–38</td><td>10 × 8</td></tr><tr><td>38–44</td><td>12 × 8</td></tr>
+      <tr><td>44–50</td><td>14 × 9</td></tr><tr><td>50–58</td><td>16 × 10</td></tr>
+      <tr><td>58–65</td><td>18 × 11</td></tr><tr><td>65–75</td><td>20 × 12</td></tr></table>
+      <div class="note">GB/T 1096 普通平键（A型圆头）；轴径取区间上限对应的键，如 Ø25 轴用 8×7。</div>`,
+    body_en: `<table><tr><th>Shaft dia. d (mm)</th><th>Key width b × height h (mm)</th></tr>
+      <tr><td>6–8</td><td>2 × 2</td></tr><tr><td>8–10</td><td>3 × 3</td></tr>
+      <tr><td>10–12</td><td>4 × 4</td></tr><tr><td>12–17</td><td>5 × 5</td></tr>
+      <tr><td>17–22</td><td>6 × 6</td></tr><tr><td>22–30</td><td>8 × 7</td></tr>
+      <tr><td>30–38</td><td>10 × 8</td></tr><tr><td>38–44</td><td>12 × 8</td></tr>
+      <tr><td>44–50</td><td>14 × 9</td></tr><tr><td>50–58</td><td>16 × 10</td></tr>
+      <tr><td>58–65</td><td>18 × 11</td></tr><tr><td>65–75</td><td>20 × 12</td></tr></table>
+      <div class="note">GB/T 1096 parallel keys (Type A, round-ended); take the key listed for the upper limit of the shaft range — e.g. a Ø25 shaft uses an 8×7 key.</div>`
+  },
+  {
+    id: "bearing", cat: "标准件规格", title: "深沟球轴承常用型号", title_en: "Common Deep-Groove Ball Bearings",
+    kw: "轴承 6204 6205 内径 外径 宽度 深沟球 bearing bore deep groove ball",
+    body: `<table><tr><th>型号</th><th>内径 × 外径 × 宽 (mm)</th></tr>
+      <tr><td>608</td><td>8 × 22 × 7</td></tr>
+      <tr><td>6004</td><td>20 × 42 × 12</td></tr>
+      <tr><td>6204</td><td>20 × 47 × 14</td></tr>
+      <tr><td>6205</td><td>25 × 52 × 15</td></tr>
+      <tr><td>6206</td><td>30 × 62 × 16</td></tr>
+      <tr><td>6207</td><td>35 × 72 × 17</td></tr>
+      <tr><td>6208</td><td>40 × 80 × 18</td></tr>
+      <tr><td>6305</td><td>25 × 62 × 17</td></tr>
+      <tr><td>6306</td><td>30 × 72 × 19</td></tr></table>
+      <div class="note">型号规律：后两位 ×5 = 内径(mm)，如 6204 → 04×5 = Ø20。</div>`,
+    body_en: `<table><tr><th>Model</th><th>Bore × OD × width (mm)</th></tr>
+      <tr><td>608</td><td>8 × 22 × 7</td></tr>
+      <tr><td>6004</td><td>20 × 42 × 12</td></tr>
+      <tr><td>6204</td><td>20 × 47 × 14</td></tr>
+      <tr><td>6205</td><td>25 × 52 × 15</td></tr>
+      <tr><td>6206</td><td>30 × 62 × 16</td></tr>
+      <tr><td>6207</td><td>35 × 72 × 17</td></tr>
+      <tr><td>6208</td><td>40 × 80 × 18</td></tr>
+      <tr><td>6305</td><td>25 × 62 × 17</td></tr>
+      <tr><td>6306</td><td>30 × 72 × 19</td></tr></table>
+      <div class="note">Reading the code: last two digits × 5 = bore in mm — e.g. 6204 → 04×5 = Ø20.</div>`
+  },
+  {
+    id: "density", cat: "单位换算", title: "常用材料密度", title_en: "Common Material Densities",
+    kw: "密度 重量 钢 铝 铜 g/cm3 比重 质量 density weight steel aluminium copper",
+    body: `<table><tr><th>材料</th><th>密度 (g/cm³)</th></tr>
+      <tr><td>钢</td><td>7.85</td></tr><tr><td>铸铁</td><td>7.2</td></tr>
+      <tr><td>不锈钢</td><td>7.93</td></tr><tr><td>铝</td><td>2.70</td></tr>
+      <tr><td>铜</td><td>8.90</td></tr><tr><td>黄铜</td><td>8.50</td></tr>
+      <tr><td>钛合金</td><td>4.50</td></tr><tr><td>尼龙66</td><td>1.14</td></tr>
+      <tr><td>POM（赛钢）</td><td>1.42</td></tr></table>
+      <div class="formula">重量(kg) = 体积(cm³) × 密度 ÷ 1000</div>
+      <div class="note">例：Ø50×100 的钢棒 ≈ 3.14×2.5²×10×7.85÷1000 ≈ 1.54kg。</div>`,
+    body_en: `<table><tr><th>Material</th><th>Density (g/cm³)</th></tr>
+      <tr><td>Steel</td><td>7.85</td></tr><tr><td>Cast iron</td><td>7.2</td></tr>
+      <tr><td>Stainless steel</td><td>7.93</td></tr><tr><td>Aluminium</td><td>2.70</td></tr>
+      <tr><td>Copper</td><td>8.90</td></tr><tr><td>Brass</td><td>8.50</td></tr>
+      <tr><td>Titanium alloy</td><td>4.50</td></tr><tr><td>Nylon 66</td><td>1.14</td></tr>
+      <tr><td>POM (acetal)</td><td>1.42</td></tr></table>
+      <div class="formula">Weight (kg) = volume (cm³) × density ÷ 1000</div>
+      <div class="note">Example: a Ø50×100 steel bar ≈ 3.14×2.5²×10×7.85÷1000 ≈ 1.54 kg.</div>`
+  }
+];
+
+const CATS = ["全部", "机械公式", "电气公式", "标准件规格", "单位换算"];
+let activeCat = "全部";
+
+/* ============ 逻辑区 ============ */
+function renderCats() {
+  document.getElementById("cats").innerHTML = CATS.map(c =>
+    `<button class="${c === activeCat ? "active" : ""}" onclick="setCat('${c}')">${UI[LANG].cats[c]}</button>`
+  ).join("");
+}
+function setCat(c) { activeCat = c; renderCats(); render(); }
+function render() {
+  const ui = UI[LANG];
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const list = DATA.filter(d => {
+    const catOk = activeCat === "全部" || d.cat === activeCat;
+    if (!catOk) return false;
+    if (!q) return true;
+    const hay = (d.title + " " + (d.title_en || "") + " " + d.kw + " " +
+      d.body.replace(/<[^>]+>/g, "") + " " + (d.body_en || "").replace(/<[^>]+>/g, "")).toLowerCase();
+    return hay.includes(q);
+  });
+  document.getElementById("count").textContent = ui.count(list.length);
+  document.getElementById("list").innerHTML = list.length ? list.map(d => `
+    <div class="card">
+      <h2>${LANG === "zh" ? d.title : (d.title_en || d.title)}<span class="tag">${ui.cats[d.cat]}</span></h2>
+      <div class="kw">${ui.kwLabel}${d.kw}</div>
+      ${LANG === "zh" ? d.body : (d.body_en || d.body)}
+    </div>`).join("")
+    : `<div class="empty">${ui.empty(document.getElementById("q").value)}</div>`;
+}
+function calcPTN() {
+  const P = parseFloat(document.getElementById("cP").value);
+  const T = parseFloat(document.getElementById("cT").value);
+  const N = parseFloat(document.getElementById("cN").value);
+  const out = document.getElementById("cOut");
+  const filled = [!isNaN(P), !isNaN(T), !isNaN(N)].filter(Boolean).length;
+  if (filled !== 2) { out.textContent = UI[LANG].ptnErr; return; }
+  if (isNaN(P)) out.textContent = `P = ${(T * N / 9550).toFixed(3)} kW`;
+  else if (isNaN(T)) out.textContent = `T = ${(9550 * P / N).toFixed(2)} N·m`;
+  else out.textContent = `n = ${(9550 * P / T).toFixed(1)} r/min`;
+}
+function calcI3() {
+  const P = parseFloat(document.getElementById("ci3P").value);
+  const U = parseFloat(document.getElementById("ci3U").value) || 380;
+  const c = parseFloat(document.getElementById("ci3C").value) || 0.85;
+  const e = parseFloat(document.getElementById("ci3E").value) || 0.9;
+  const out = document.getElementById("ci3Out");
+  if (isNaN(P) || P <= 0) { out.textContent = UI[LANG].i3Err; return; }
+  out.textContent = `I = ${(P * 1000 / (1.7320508 * U * c * e)).toFixed(2)} A`;
+}
+function calcLS() {
+  const D = parseFloat(document.getElementById("lsD").value);
+  const N = parseFloat(document.getElementById("lsN").value);
+  const out = document.getElementById("lsOut");
+  if (isNaN(D) || isNaN(N) || D <= 0 || N <= 0) { out.textContent = UI[LANG].lsErr; return; }
+  out.textContent = `v = ${(Math.PI * D * N / 60000).toFixed(2)} m/s`;
+}
+function setLang(lang) {
+  if (!UI[lang]) lang = "zh";
+  LANG = lang;
+  const ui = UI[lang];
+  document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+  document.title = ui.docTitle;
+  document.getElementById("hdr-title").textContent = ui.hdrTitle;
+  document.getElementById("hdr-sub").textContent = ui.hdrSub;
+  document.getElementById("q").setAttribute("placeholder", ui.placeholder);
+  document.getElementById("ftr").textContent = ui.footer;
+  document.getElementById("btn-en").classList.toggle("active", lang === "en");
+  document.getElementById("btn-zh").classList.toggle("active", lang === "zh");
+  try { localStorage.setItem("md-lang", lang); } catch (e) {}
+  renderCats(); render();
+}
+document.getElementById("q").addEventListener("input", render);
+(function () {
+  let lang = null;
+  try { lang = localStorage.getItem("md-lang"); } catch (e) {}
+  if (!lang) {
+    const nav = (navigator.language || "zh").toLowerCase();
+    lang = nav.indexOf("zh") === 0 ? "zh" : "en";
+  }
+  setLang(lang);
+})();
+</script>
+</body>
+</html>
